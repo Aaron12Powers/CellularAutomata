@@ -7,20 +7,22 @@ import module
 
 rule = 70
 
+#Define Cell Sizes
 WIDTH = 15
 HEIGHT = 15
 MARGIN = WIDTH // 5
 
-
+#Define Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (128, 128, 128)
 
+#Define Number of Columns
 columns = 35
 rows = 100
 
-cells = [[module.Cell for i in range(rows)] for j in range(columns)]
 
+cells = [[module.Cell for i in range(rows)] for j in range(columns)]
 
 
 for row in range(0, rows):
@@ -38,16 +40,6 @@ screen = pygame.display.set_mode((window_width, window_height))
 
 pygame.display.set_caption('Cellular Automata')
 
-# count = 0
-# for cell in cells:
-#     if count % 3 == 0:
-#         cell.color = 0
-#     elif count % 3 == 1:
-#         cell.color = 1
-#     else:
-#         cell.color = 2
-
-#     count += 1
 
 module.StartSim(cells, rows, columns)
 module.RunSim(cells, rows, columns, rule)
@@ -68,16 +60,15 @@ tick_count = 0
 
 row_step = 0
 
+#Main pygame loop
 while running:
-    # grid = newCube
-    for event in pygame.event.get():  # User interacted with program
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:  
             running = False  # Exit loop/ close pygame when x is clicked
 
-    # HEIGHT = module.setHEIGHT()
-
     screen.fill(GREY)
 
+    #update next row every 20 ticks
     if tick_count % 20 == 0:
         row_step += 1
 
@@ -102,17 +93,7 @@ while running:
                     [(MARGIN + WIDTH) * cells[column][row].column + MARGIN,
                     (MARGIN + HEIGHT) * cells[column][row].row + MARGIN,
                     WIDTH, HEIGHT])
-    
 
-
-    # for row in range(rows):
-    #     for column in range(columns):
-    #         color = GREY
-    #         pygame.draw.rect(screen,
-    #                          color,
-    #                          [(MARGIN + WIDTH) * column + MARGIN,
-    #                           (MARGIN + HEIGHT) * row + MARGIN,
-    #                           WIDTH, HEIGHT])
 
     if row_step == rows:
         row_step -= 1
