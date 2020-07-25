@@ -5,11 +5,16 @@ import pygame
 import module
 
 
-rule = 70
+rule = 30
+rotateRules = False
+
+#Define Number of Columns
+columns = 159
+rows = 75
 
 #Define Cell Sizes
-WIDTH = 15
-HEIGHT = 15
+WIDTH = 10
+HEIGHT = 10
 MARGIN = WIDTH // 5
 
 #Define Colors
@@ -17,9 +22,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (128, 128, 128)
 
-#Define Number of Columns
-columns = 35
-rows = 100
+
 
 
 cells = [[module.Cell for i in range(rows)] for j in range(columns)]
@@ -38,7 +41,7 @@ window_width = (((WIDTH + MARGIN) * columns) + MARGIN)
 
 screen = pygame.display.set_mode((window_width, window_height))
 
-pygame.display.set_caption('Cellular Automata')
+pygame.display.set_caption('Cellular Automata - Rule ' + str(rule))
 
 
 module.StartSim(cells, rows, columns)
@@ -50,7 +53,7 @@ for row in range(6):
     for column in range(8):
         grid[row].append(0)
 
-pygame.init()
+#pygame.init()
 
 running = True
 
@@ -60,17 +63,42 @@ tick_count = 0
 
 row_step = 0
 
+pause = False
+
+speed = 41
+
 #Main pygame loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  
             running = False  # Exit loop/ close pygame when x is clicked
+        key=pygame.key.get_pressed()  #checking pressed keys
+        if key[pygame.K_RETURN]: 
+            row_step = 0
+        if key[pygame.K_SPACE]:
+            if pause: pause = False
+            else: pause = True 
+        if key[pygame.K_DOWN]:
+            speed = int(speed * 2)
+        if key[pygame.K_UP]:
+            if speed > 1:
+                speed = int(speed * .75)
+
+        if key[pygame.K_LEFT]:
+            rule -= 1
+        if key[pygame.K_RIGHT]:
+            rule += 1
+
+
+
+    
 
     screen.fill(GREY)
 
     #update next row every 20 ticks
-    if tick_count % 20 == 0:
-        row_step += 1
+    if not pause:
+        if (tick_count) % speed == 0:
+            row_step += 1
 
     for row in range(0, rows):
         for column in range(0, columns):
@@ -96,8 +124,19 @@ while running:
 
 
     if row_step == rows:
-        row_step -= 1
-
+        row_step = 0
+        if rotateRules:
+            if rule <= 255:
+                rule += 1
+                pygame.display.set_caption('Cellular Automata - Rule ' + str(rule))
+                module.StartSim(cells, rows, columns)
+                module.RunSim(cells, rows, columns, rule)
+            else:
+                rule = 0
+        else:
+            pygame.display.set_caption('Cellular Automata - Rule ' + str(rule))
+            module.StartSim(cells, rows, columns)
+            module.RunSim(cells, rows, columns, rule)
     tick_count += 1
     clock.tick(60)
    
