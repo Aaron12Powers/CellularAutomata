@@ -5,26 +5,31 @@ import pygame
 import module
 
 
+rule = 70
 
-WIDTH = 45
-HEIGHT = 45
-MARGIN = 5
+WIDTH = 15
+HEIGHT = 15
+MARGIN = WIDTH // 5
+
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (128, 128, 128)
 
-columns = 8
-rows = 15
+columns = 35
+rows = 100
 
-cells = []
+cells = [[module.Cell for i in range(rows)] for j in range(columns)]
+
+
 
 for row in range(0, rows):
     for column in range(0, columns):
-        cells.append(module.Cell(row, column))
+        cells[column][row]  = (module.Cell(row, column))
 
-for cell in cells:
-    print(cell.row, cell.column)
+for row in range(0, rows):
+    for column in range(0, columns):
+        print(cells[column][row].row,cells[column][row].column)
 
 window_height = (((HEIGHT + MARGIN) * rows) + MARGIN) 
 window_width = (((WIDTH + MARGIN) * columns) + MARGIN)
@@ -33,18 +38,19 @@ screen = pygame.display.set_mode((window_width, window_height))
 
 pygame.display.set_caption('Cellular Automata')
 
-count = 0
-for cell in cells:
-    if count % 3 == 0:
-        cell.color = 0
-    elif count % 3 == 1:
-        cell.color = 1
-    else:
-        cell.color = 2
+# count = 0
+# for cell in cells:
+#     if count % 3 == 0:
+#         cell.color = 0
+#     elif count % 3 == 1:
+#         cell.color = 1
+#     else:
+#         cell.color = 2
 
-    count += 1
+#     count += 1
 
-
+module.StartSim(cells, rows, columns)
+module.RunSim(cells, rows, columns, rule)
 
 grid = []
 for row in range(6):
@@ -60,6 +66,8 @@ clock = pygame.time.Clock()
 
 tick_count = 0
 
+row_step = 0
+
 while running:
     # grid = newCube
     for event in pygame.event.get():  # User interacted with program
@@ -68,22 +76,34 @@ while running:
 
     # HEIGHT = module.setHEIGHT()
 
-    screen.fill(BLACK)
+    screen.fill(GREY)
 
+    if tick_count % 20 == 0:
+        row_step += 1
 
-    for cell in cells:
-        if cell.color == 0:
-            color = WHITE
-        elif cell.color == 1:
-            color = BLACK
-        else:
-            color = GREY
-
-        pygame.draw.rect(screen,
+    for row in range(0, rows):
+        for column in range(0, columns):
+            if row <= row_step:
+                if cells[column][row].color == 0:
+                    color = WHITE
+                elif cells[column][row].color == 1:
+                    color = BLACK
+                else:
+                    color = GREY
+                pygame.draw.rect(screen,
                     color,
-                    [(MARGIN + WIDTH) * cell.column + MARGIN,
-                    (MARGIN + HEIGHT) * cell.row + MARGIN,
+                    [(MARGIN + WIDTH) * cells[column][row].column + MARGIN,
+                    (MARGIN + HEIGHT) * cells[column][row].row + MARGIN,
                     WIDTH, HEIGHT])
+            else:
+                color = GREY
+                pygame.draw.rect(screen,
+                    color,
+                    [(MARGIN + WIDTH) * cells[column][row].column + MARGIN,
+                    (MARGIN + HEIGHT) * cells[column][row].row + MARGIN,
+                    WIDTH, HEIGHT])
+    
+
 
     # for row in range(rows):
     #     for column in range(columns):
@@ -93,6 +113,9 @@ while running:
     #                          [(MARGIN + WIDTH) * column + MARGIN,
     #                           (MARGIN + HEIGHT) * row + MARGIN,
     #                           WIDTH, HEIGHT])
+
+    if row_step == rows:
+        row_step -= 1
 
     tick_count += 1
     clock.tick(60)
